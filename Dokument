@@ -1,12 +1,12 @@
-Update Artikel
+Delete Artikel
 
 =====================
 perhatian file ini :
 
 1. C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
-2. C:\xampp\htdocs\CodeIgniter\application\views\form_edit.php
-3. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
-4. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
+2. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
+3. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
+
 
 
 =======================
@@ -18,7 +18,7 @@ link nya :
 http://localhost/CodeIgniter/
 
 
-yg di di ubah ADA 4 FILE : 
+yg di di ubah ADA 3 FILE : 
 
 1. C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
 
@@ -83,113 +83,17 @@ class Blog extends CI_Controller
 		$this->load->view('form_edit', $data);
 	}
 
-
+	public function delete($id)
+	{
+		$this->Blog_model->deleteBlog($id);
+		redirect('/');
+	}
 
 }
 
 
-===================================================================
-2. C:\xampp\htdocs\CodeIgniter\application\views\form_edit.php
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Tambah Artikel</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			background-color: #f4f4f4;
-			margin: 0;
-			padding: 0;
-		}
-
-		.container {
-			max-width: 800px;
-			margin: 40px auto;
-			background-color: #fff;
-			padding: 30px;
-			border-radius: 5px;
-			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-		}
-
-		h1 {
-			text-align: center;
-			margin-bottom: 30px;
-		}
-
-		.form-group {
-			margin-bottom: 20px;
-		}
-
-		label {
-			display: block;
-			font-weight: bold;
-			margin-bottom: 5px;
-		}
-
-		input[type="text"],
-		textarea {
-			width: 100%;
-			padding: 10px;
-			border: 1px solid #ccc;
-			border-radius: 3px;
-			font-size: 16px;
-		}
-
-		textarea {
-			resize: vertical;
-		}
-
-		button {
-			display: block;
-			width: 100%;
-			padding: 10px;
-			background-color: #4CAF50;
-			color: #fff;
-			border: none;
-			border-radius: 3px;
-			font-size: 16px;
-			cursor: pointer;
-		}
-
-		button:hover {
-			background-color: #45a049;
-		}
-	</style>
-</head>
-
-<body>
-	<div class="container">
-		<h1>Tambah Artikel</h1>
-		<form method="POST">
-			<div class="form-group">
-				<label for="title">Judul</label>
-				<input type="text" id="title" name="title" value="<?php echo $blog['title']; ?>" required>
-			</div>
-			<div class="form-group">
-				<label for="url">URL</label>
-				<input type="text" id="url" name="url" value="<?php echo $blog['url']; ?>" required>
-			</div>
-			<div class="form-group">
-				<label for="cover">Cover</label>
-				<input type="text" id="cover" name="cover" value="<?php echo $blog['cover']; ?>" required>
-			</div>
-			<div class="form-group">
-				<label for="content">Konten</label>
-				<textarea id="content" name="content" rows="10" required><?php echo $blog['content']; ?></textarea>
-			</div>
-			<button type="submit">Simpan</button>
-		</form>
-	</div>
-</body>
-
-</html>
-
-==================================================================
-3. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
+====================================================================
+2. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
 
 <?php
 class Blog_model extends CI_Model
@@ -219,11 +123,20 @@ class Blog_model extends CI_Model
 		return $this->db->affected_rows();
 	}
 
+	public function deleteBlog($id)
+	{
+		$this->db->where('id', $id);
+		$this->db->delete('blog_posts');
+		return $this->db->affected_rows();
+	}
+
 }
 ?>
 
-=============================================================
-4. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
+
+============================================================
+3. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -251,6 +164,7 @@ class Blog_model extends CI_Model
 							</h2>
 							<p class="card-text"><?php echo $blog['content']; ?></p>
 							<a href="<?php echo site_url('blog/edit/' . $blog['id']); ?>"> Edit</a>
+							<a href="<?php echo site_url('blog/delete/' . $blog['id']); ?>"> Delete</a>
 						</div>
 					</div>
 				</div>
@@ -263,4 +177,5 @@ class Blog_model extends CI_Model
 </html>
 
 
-===================================================================
+=================================================
+
