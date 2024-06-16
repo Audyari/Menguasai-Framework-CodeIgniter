@@ -1,10 +1,12 @@
-Membuat Model
+Update Artikel
 
 =====================
 perhatian file ini :
 
 1. C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
-2. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
+2. C:\xampp\htdocs\CodeIgniter\application\views\form_edit.php
+3. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
+4. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
 
 
 =======================
@@ -16,7 +18,7 @@ link nya :
 http://localhost/CodeIgniter/
 
 
-yg di di ubah ADA 2 FILE : 
+yg di di ubah ADA 4 FILE : 
 
 1. C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
 
@@ -41,17 +43,153 @@ class Blog extends CI_Controller
 	}
 	public function detail($url)
 	{
-		$data['blogs'] = $this->Blog_model->getSingleBlog($url);
+		$data['blogs'] = $this->Blog_model->getSingleBlog('url', $url);
 		$this->load->view('detail', $data);
 	}
+
+	public function add()
+	{
+		if ($this->input->post()) {
+
+			$data['title'] = $this->input->post('title');
+			$data['content'] = $this->input->post('content');
+			$data['url'] = $this->input->post('url');
+			$data['cover'] = $this->input->post('cover');
+
+			$id = $this->Blog_model->insertBlog($data);
+
+			if ($id)
+				echo "Data berhasil disimpan";
+			else
+				echo "Data gagal disimpan";
+		}
+
+		$this->load->view('form_add');
+	}
+
+	public function edit($id)
+	{
+		$data['blog'] = $this->Blog_model->getSingleBlog('id', $id);
+		if ($this->input->post()) {
+			$post['title'] = $this->input->post('title');
+			$post['content'] = $this->input->post('content');
+			$post['url'] = $this->input->post('url');
+			$id = $this->Blog_model->updateBlog($id, $post);
+			if ($id)
+				echo "Data berhasil disimpan";
+			else
+				echo "Data gagal disimpan";
+		}
+		$this->load->view('form_edit', $data);
+	}
+
 
 
 }
 
 
-======================================================
+===================================================================
+2. C:\xampp\htdocs\CodeIgniter\application\views\form_edit.php
 
-2. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Tambah Artikel</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f4f4f4;
+			margin: 0;
+			padding: 0;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 40px auto;
+			background-color: #fff;
+			padding: 30px;
+			border-radius: 5px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+		}
+
+		h1 {
+			text-align: center;
+			margin-bottom: 30px;
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		label {
+			display: block;
+			font-weight: bold;
+			margin-bottom: 5px;
+		}
+
+		input[type="text"],
+		textarea {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 3px;
+			font-size: 16px;
+		}
+
+		textarea {
+			resize: vertical;
+		}
+
+		button {
+			display: block;
+			width: 100%;
+			padding: 10px;
+			background-color: #4CAF50;
+			color: #fff;
+			border: none;
+			border-radius: 3px;
+			font-size: 16px;
+			cursor: pointer;
+		}
+
+		button:hover {
+			background-color: #45a049;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Tambah Artikel</h1>
+		<form method="POST">
+			<div class="form-group">
+				<label for="title">Judul</label>
+				<input type="text" id="title" name="title" value="<?php echo $blog['title']; ?>" required>
+			</div>
+			<div class="form-group">
+				<label for="url">URL</label>
+				<input type="text" id="url" name="url" value="<?php echo $blog['url']; ?>" required>
+			</div>
+			<div class="form-group">
+				<label for="cover">Cover</label>
+				<input type="text" id="cover" name="cover" value="<?php echo $blog['cover']; ?>" required>
+			</div>
+			<div class="form-group">
+				<label for="content">Konten</label>
+				<textarea id="content" name="content" rows="10" required><?php echo $blog['content']; ?></textarea>
+			</div>
+			<button type="submit">Simpan</button>
+		</form>
+	</div>
+</body>
+
+</html>
+
+==================================================================
+3. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
 
 <?php
 class Blog_model extends CI_Model
@@ -61,14 +199,68 @@ class Blog_model extends CI_Model
 		$query = $this->db->get("blog_posts");
 		return $query->result_array();
 	}
-	public function getSingleBlog($url)
+	public function getSingleBlog($field, $value)
 	{
-		$this->db->where('url', $url);
+		$this->db->where($field, $value);
 		$query = $this->db->get('blog_posts');
 		return $query->row_array();
 	}
+
+	public function insertBlog($data)
+	{
+		$this->db->insert('blog_posts', $data);
+		return $this->db->insert_id();
+	}
+
+	public function updateBlog($id, $post)
+	{
+		$this->db->where('id', $id);
+		$this->db->update('blog_posts', $post);
+		return $this->db->affected_rows();
+	}
+
 }
 ?>
 
+=============================================================
+4. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
 
-===================================
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Artikel Terbaru</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+	<div class="container my-5">
+		<h1 class="mb-4">Artikel Terbaru</h1>
+		<div class="row">
+			<?php foreach ($blogs as $key => $blog): ?>
+				<div class="col-md-6 mb-4">
+					<div class="card">
+						<div class="card-body">
+							<h2 class="card-title">
+								<a href="<?php echo site_url('blog/detail/' . $blog['url']); ?>"
+									class="text-decoration-none">
+									<?php echo $blog['title']; ?>
+								</a>
+							</h2>
+							<p class="card-text"><?php echo $blog['content']; ?></p>
+							<a href="<?php echo site_url('blog/edit/' . $blog['id']); ?>"> Edit</a>
+						</div>
+					</div>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
+
+
+===================================================================
