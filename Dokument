@@ -1,13 +1,10 @@
-Delete Artikel
+Search Artikel
 
 =====================
 perhatian file ini :
 
-1. C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
-2. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
-3. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
-
-
+1. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
+2. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
 
 =======================
 
@@ -18,88 +15,18 @@ link nya :
 http://localhost/CodeIgniter/
 
 
-yg di di ubah ADA 3 FILE : 
-
-1. C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
-
-<?php
-defined('BASEPATH') or exit('No direct script access allowed');
-
-class Blog extends CI_Controller
-{
-
-	function __construct()
-	{
-		parent::__construct();
-		$this->load->database();
-		$this->load->model('Blog_model');
-		$this->load->helper('url');
-	}
-
-	public function index()
-	{
-		$data['blogs'] = $this->Blog_model->getBlogs();
-		$this->load->view('blogs', $data);
-	}
-	public function detail($url)
-	{
-		$data['blogs'] = $this->Blog_model->getSingleBlog('url', $url);
-		$this->load->view('detail', $data);
-	}
-
-	public function add()
-	{
-		if ($this->input->post()) {
-
-			$data['title'] = $this->input->post('title');
-			$data['content'] = $this->input->post('content');
-			$data['url'] = $this->input->post('url');
-			$data['cover'] = $this->input->post('cover');
-
-			$id = $this->Blog_model->insertBlog($data);
-
-			if ($id)
-				echo "Data berhasil disimpan";
-			else
-				echo "Data gagal disimpan";
-		}
-
-		$this->load->view('form_add');
-	}
-
-	public function edit($id)
-	{
-		$data['blog'] = $this->Blog_model->getSingleBlog('id', $id);
-		if ($this->input->post()) {
-			$post['title'] = $this->input->post('title');
-			$post['content'] = $this->input->post('content');
-			$post['url'] = $this->input->post('url');
-			$id = $this->Blog_model->updateBlog($id, $post);
-			if ($id)
-				echo "Data berhasil disimpan";
-			else
-				echo "Data gagal disimpan";
-		}
-		$this->load->view('form_edit', $data);
-	}
-
-	public function delete($id)
-	{
-		$this->Blog_model->deleteBlog($id);
-		redirect('/');
-	}
-
-}
+yg di di ubah ADA 2 FILE : 
 
 
-====================================================================
-2. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
+1. C:\xampp\htdocs\CodeIgniter\application\models\Blog_model.php
 
 <?php
 class Blog_model extends CI_Model
 {
 	public function getBlogs()
 	{
+		$filter = $this->input->get('find');
+		$this->db->like('title', $filter);
 		$query = $this->db->get("blog_posts");
 		return $query->result_array();
 	}
@@ -130,13 +57,15 @@ class Blog_model extends CI_Model
 		return $this->db->affected_rows();
 	}
 
+
+
 }
 ?>
 
 
-============================================================
-3. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
+==================================================
 
+2. C:\xampp\htdocs\CodeIgniter\application\views\blogs.php
 
 <!DOCTYPE html>
 <html lang="en">
@@ -149,12 +78,38 @@ class Blog_model extends CI_Model
 </head>
 
 <body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+		<div class="container">
+			<a class="navbar-brand" href="#">Artikel Terbaru</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+
+					<li class="nav-item">
+						<a href="<?php echo site_url('blog/add'); ?>" class="nav-link">Tambah Artikel </a>
+					</li>
+					<li class="nav-item">
+						<form class="d-flex" role="search">
+							<input class="form-control me-2" type="search" placeholder="Cari artikel" name="find"
+								aria-label="Cari">
+							<button class="btn btn-outline-light" type="submit">Cari</button>
+						</form>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
 	<div class="container my-5">
 		<h1 class="mb-4">Artikel Terbaru</h1>
 		<div class="row">
 			<?php foreach ($blogs as $key => $blog): ?>
 				<div class="col-md-6 mb-4">
 					<div class="card">
+						<img src="thumbnail.jpg" class="card-img-top" alt="Thumbnail Artikel">
 						<div class="card-body">
 							<h2 class="card-title">
 								<a href="<?php echo site_url('blog/detail/' . $blog['url']); ?>"
@@ -163,19 +118,24 @@ class Blog_model extends CI_Model
 								</a>
 							</h2>
 							<p class="card-text"><?php echo $blog['content']; ?></p>
-							<a href="<?php echo site_url('blog/edit/' . $blog['id']); ?>"> Edit</a>
-							<a href="<?php echo site_url('blog/delete/' . $blog['id']); ?>"> Delete</a>
+							<p class="card-text"><small class="text-muted">Dipublikasikan pada 16 Juni 2024</small></p>
+							<div class="d-flex justify-content-end">
+								<a href="<?php echo site_url('blog/edit/' . $blog['id']); ?>"
+									class="btn btn-primary me-2">Edit</a>
+								<a href="<?php echo site_url('blog/delete/' . $blog['id']); ?>"
+									class="btn btn-danger">Hapus</a>
+							</div>
 						</div>
 					</div>
 				</div>
 			<?php endforeach; ?>
 		</div>
 	</div>
+
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
 
 
-=================================================
-
+===================================================
