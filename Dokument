@@ -1,4 +1,4 @@
-Default Controller
+Akses Database
 
 =====================
 perhatian file ini :
@@ -16,137 +16,83 @@ link nya :
 http://localhost/CodeIgniter/
 
 
-yg di di ubah ADA 3 FILE : 
+yg di di ubah ADA 4 FILE : 
 
-1. C:\xampp\htdocs\CodeIgniter\application\config\routes.php
+1. buat database
 2. C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
 3. C:\xampp\htdocs\CodeIgniter\application\views\blog.php
+4. C:\xampp\htdocs\CodeIgniter\application\config\database.php
 
-1. code nya : \application\config\routes.php
+1. code nya : Buat DataBase 
 
-<?php
-defined('BASEPATH') or exit('No direct script access allowed');
+	* mysql -u root
+	* CREATE DATABASE blog_db;
+	* CREATE TABLE `blog_posts` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+ 		  `title` varchar(255) NOT NULL,
+  		  `content` text NOT NULL,
+  		  `url` varchar(255) NOT NULL,
+  		  `cover` varchar(255) NOT NULL,
+  		  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  		PRIMARY KEY (`id`)
+	   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+	* SELECT * FROM `blog_posts`;
 
-/*
-| -------------------------------------------------------------------------
-| URI ROUTING
-| -------------------------------------------------------------------------
-| This file lets you re-map URI requests to specific controller functions.
-|
-| Typically there is a one-to-one relationship between a URL string
-| and its corresponding controller class/method. The segments in a
-| URL normally follow this pattern:
-|
-|	example.com/class/method/id/
-|
-| In some instances, however, you may want to remap this relationship
-| so that a different class/function is called than the one
-| corresponding to the URL.
-|
-| Please see the user guide for complete details:
-|
-|	https://codeigniter.com/userguide3/general/routing.html
-|
-| -------------------------------------------------------------------------
-| RESERVED ROUTES
-| -------------------------------------------------------------------------
-|
-| There are three reserved routes:
-|
-|	$route['default_controller'] = 'welcome';
-|
-| This route indicates which controller class should be loaded if the
-| URI contains no data. In the above example, the "welcome" class
-| would be loaded.
-|
-|	$route['404_override'] = 'errors/page_missing';
-|
-| This route will tell the Router which controller/method to use if those
-| provided in the URL cannot be matched to a valid route.
-|
-|	$route['translate_uri_dashes'] = FALSE;
-|
-| This is not exactly a route, but allows you to automatically route
-| controller and method names that contain dashes. '-' isn't a valid
-| class or method name character, so it requires translation.
-| When you set this option to TRUE, it will replace ALL dashes in the
-| controller and method URI segments.
-|
-| Examples:	my-controller/index	-> my_controller/index
-|		my-controller/my-method	-> my_controller/my_method
-*/
-$route['default_controller'] = 'blog';
-$route['404_override'] = '';
-$route['translate_uri_dashes'] = FALSE;
+	* DATA NYA :
+
+		INSERT INTO `blog_posts` (`title`, `content`, `url`, `cover`) VALUES
+('Mengenal Teknologi Terbaru', 'Artikel ini membahas perkembangan teknologi terkini yang dapat membantu meningkatkan produktivitas.', 'mengenal-teknologi-terbaru', 'teknologi-terbaru.jpg'),
+('Tips Memulai Bisnis Online', 'Beberapa tips yang dapat Anda terapkan untuk memulai bisnis online yang sukses.', 'tips-memulai-bisnis-online', 'bisnis-online.jpg'),
+('Resep Masakan Tradisional', 'Artikel ini menyajikan beberapa resep masakan tradisional yang lezat dan mudah dibuat.', 'resep-masakan-tradisional', 'masakan-tradisional.jpg'),
+('Sejarah Peradaban Kuno', 'Artikel ini menceritakan tentang peradaban kuno yang menarik dan berpengaruh hingga saat ini.', 'sejarah-peradaban-kuno', 'peradaban-kuno.jpg'),
+('Tips Hidup Sehat Alami', 'Beberapa tips sederhana untuk menjalani gaya hidup sehat secara alami.', 'tips-hidup-sehat-alami', 'hidup-sehat.jpg');
 
 
-============================
+================================================
 
-2. CODE NYA : \application\controllers\Blog.php
+data yg di ubah  
+2. C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
+
+code nya :
 
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Blog extends CI_Controller
 {
+	protected $dbPHP;
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see https://codeigniter.com/userguide3/general/urls.html
-	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->load->database();
+		$this->dbPHP = $this->db;
+	}
+
 	public function index()
 	{
-
-		$data['blogs'] = [
-			[
-				'title' => 'Artikel Pertama',
-				'content' => '<p>Lorem Ipsum is simply dummy text of the printing and 	
-				 typesetting industry.</p>'
-			],
-			[
-				'title' => 'Artikel Kedua',
-				'content' => '<p>Lorem Ipsum has been the industrys standard dummy 
-				 text ever since the 1500s, when an unknown printer took a galley of type 
-				 and scrambled it to make a type specimen book.</p>'
-			],
-			[
-				'title' => 'Artikel Ketiga',
-				'content' => '<p>Lorem Ipsum is simply dummy text of the printing and 	
-				 typesetting industry. Lorem Ipsum has been the industrys standard dummy 
-				 text ever since the 1500s.</p>'
-			]
-		];
-		$this->load->helper('url');
+		$data['blogs'] = $this->dbPHP->get('blog_posts')->result_array();
 		$this->load->view('blog', $data);
 	}
+
 	public function listdata()
 	{
 		$this->load->view('list_data');
 	}
-	public function detail()
+
+	public function detail($id)
 	{
-		$this->load->view('detail_blog');
+		$data['blog'] = $this->dbPHP->get_where('blog_posts', ['id' => $id])->row_array();
+		$this->load->view('detail_blog', $data);
 	}
 }
 
 
-================================================
+=====================================
 
+3. C:\xampp\htdocs\CodeIgniter\application\views\blog.php
 
-3. CodeIgniter\application\views\blog.php
-
-code nya view :
+code nya di ubah :
 
 <html>
 
@@ -157,15 +103,123 @@ code nya view :
 
 <body>
 	<h1>Artikel Terbaru</h1>
-	<?php foreach ($blogs as $key => $blog): ?>
+	<?php
+	foreach ($blogs as $key => $blog) {
+		?>
 		<div class="blog">
 			<h2><?php echo $blog['title']; ?></h2>
-			<?php echo $blog['content'];
-	endforeach;
+			<?php echo $blog['content']; ?>
+		</div>
+		<?php
+	}
 	?>
 </body>
 
 </html>
 
-======================================
+===================================
 
+4. C:\xampp\htdocs\CodeIgniter\application\config\database.php
+
+yg di ubah code nya : 
+
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+/*
+| -------------------------------------------------------------------
+| DATABASE CONNECTIVITY SETTINGS
+| -------------------------------------------------------------------
+| This file will contain the settings needed to access your database.
+|
+| For complete instructions please consult the 'Database Connection'
+| page of the User Guide.
+|
+| -------------------------------------------------------------------
+| EXPLANATION OF VARIABLES
+| -------------------------------------------------------------------
+|
+|	['dsn']      The full DSN string describe a connection to the database.
+|	['hostname'] The hostname of your database server.
+|	['username'] The username used to connect to the database
+|	['password'] The password used to connect to the database
+|	['database'] The name of the database you want to connect to
+|	['dbdriver'] The database driver. e.g.: mysqli.
+|			Currently supported:
+|				 cubrid, ibase, mssql, mysql, mysqli, oci8,
+|				 odbc, pdo, postgre, sqlite, sqlite3, sqlsrv
+|	['dbprefix'] You can add an optional prefix, which will be added
+|				 to the table name when using the  Query Builder class
+|	['pconnect'] TRUE/FALSE - Whether to use a persistent connection
+|	['db_debug'] TRUE/FALSE - Whether database errors should be displayed.
+|	['cache_on'] TRUE/FALSE - Enables/disables query caching
+|	['cachedir'] The path to the folder where cache files should be stored
+|	['char_set'] The character set used in communicating with the database
+|	['dbcollat'] The character collation used in communicating with the database
+|				 NOTE: For MySQL and MySQLi databases, this setting is only used
+| 				 as a backup if your server is running PHP < 5.2.3 or MySQL < 5.0.7
+|				 (and in table creation queries made with DB Forge).
+| 				 There is an incompatibility in PHP with mysql_real_escape_string() which
+| 				 can make your site vulnerable to SQL injection if you are using a
+| 				 multi-byte character set and are running versions lower than these.
+| 				 Sites using Latin-1 or UTF-8 database character set and collation are unaffected.
+|	['swap_pre'] A default table prefix that should be swapped with the dbprefix
+|	['encrypt']  Whether or not to use an encrypted connection.
+|
+|			'mysql' (deprecated), 'sqlsrv' and 'pdo/sqlsrv' drivers accept TRUE/FALSE
+|			'mysqli' and 'pdo/mysql' drivers accept an array with the following options:
+|
+|				'ssl_key'    - Path to the private key file
+|				'ssl_cert'   - Path to the public key certificate file
+|				'ssl_ca'     - Path to the certificate authority file
+|				'ssl_capath' - Path to a directory containing trusted CA certificates in PEM format
+|				'ssl_cipher' - List of *allowed* ciphers to be used for the encryption, separated by colons (':')
+|				'ssl_verify' - TRUE/FALSE; Whether verify the server certificate or not
+|
+|	['compress'] Whether or not to use client compression (MySQL only)
+|	['stricton'] TRUE/FALSE - forces 'Strict Mode' connections
+|							- good for ensuring strict SQL while developing
+|	['ssl_options']	Used to set various SSL options that can be used when making SSL connections.
+|	['failover'] array - A array with 0 or more data for connections if the main should fail.
+|	['save_queries'] TRUE/FALSE - Whether to "save" all executed queries.
+| 				NOTE: Disabling this will also effectively disable both
+| 				$this->db->last_query() and profiling of DB queries.
+| 				When you run a query, with this setting set to TRUE (default),
+| 				CodeIgniter will store the SQL statement for debugging purposes.
+| 				However, this may cause high memory usage, especially if you run
+| 				a lot of SQL queries ... disable this to avoid that problem.
+|
+| The $active_group variable lets you choose which connection group to
+| make active.  By default there is only one group (the 'default' group).
+|
+| The $query_builder variables lets you determine whether or not to load
+| the query builder class.
+*/
+$active_group = 'default';
+$query_builder = TRUE;
+
+$db['default'] = array(
+	'dsn' => '',
+	'hostname' => 'localhost',
+	'username' => 'root',
+	'password' => '',
+	'database' => 'myapp',
+	'dbdriver' => 'mysqli',
+	'dbprefix' => '',
+	'pconnect' => FALSE,
+	'db_debug' => (ENVIRONMENT !== 'production'),
+	'cache_on' => FALSE,
+	'cachedir' => '',
+	'char_set' => 'utf8',
+	'dbcollat' => 'utf8_general_ci',
+	'swap_pre' => '',
+	'encrypt' => FALSE,
+	'compress' => FALSE,
+	'stricton' => FALSE,
+	'failover' => array(),
+	'save_queries' => TRUE
+);
+
+
+
+==========================================
