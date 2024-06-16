@@ -174,7 +174,9 @@ public function index($nama, $goldarah, $alamat)
 		$goldarah = urldecode($goldarah);
 		$alamat = urldecode($alamat);
 
-		echo "Selamat Datang $nama, Golongan darah Anda $goldarah dan Alamat Anda $alamat";
+		echo "<h1>Selamat Datang $nama</h1><br>";
+		echo "<p>Golongan darah Anda $goldarah <br></p>";
+		echo "<p>Alamat Anda $alamat <br></p>";
 	}
 
 
