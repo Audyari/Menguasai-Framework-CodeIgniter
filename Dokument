@@ -1,8 +1,4 @@
-Membuat Halaman Pertama dengan CodeIgniter
-
-1. download codeigniter nya : https://codeigniter.com/download
-2. jalankan xampp masukkan ke : C:\xampp\htdocs
-3. saya pake CodeIgniter 3
+Controller
 
 =====================
 perhatian file ini :
@@ -13,20 +9,24 @@ perhatian file ini :
 
 =======================
 
-testing pertama : 
+testing ada 2 exmple  : 
 
-http://localhost/CodeIgniter/index.php/Welcome/percobaan
+link nya : 
 
-yg di edit file :
+http://localhost/CodeIgniter/index.php/Blog/index  "contoh pertama"
+http://localhost/CodeIgniter/index.php/Blog/index/AudyariW  "contoh ke dua"
 
-1. C:\xampp\htdocs\CodeIgniter\application\controllers\Welcome.php
 
-code nya :
+yg di di ubah : 
+
+1. C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
+
+code nya : 
 
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Welcome extends CI_Controller
+class Blog extends CI_Controller
 {
 
 	/**
@@ -46,48 +46,34 @@ class Welcome extends CI_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('welcome_message');
+		echo "Selamat Datang";
 	}
-
-	public function percobaan()
+	public function listdata()
 	{
-		echo "Ini halaman percobaan";
+		$this->load->view('list_data');
+	}
+	public function detail()
+	{
+		$this->load->view('detail_blog');
 	}
 }
 
 
 =====================================================
 
-contoh ke 2 :
 
-link nya : http://localhost/CodeIgniter/index.php/Welcome/percobaan
+contoh kedua
 
-yg di edit 2 file :
+http://localhost/CodeIgniter/index.php/Blog/index/AudyariW
 
-1. C:\xampp\htdocs\CodeIgniter\application\views\percobaan.php
+yg di edit :
 
-<!DOCTYPE html>
-<html>
-
-<head>
-	<title>Halaman Pertama</title>
-</head>
-
-<body>
-	<h1>Selamat Datang di Halaman Pertama!</h1>
-	<p>Ini adalah contoh halaman pertama yang dibuat dengan CodeIgniter.</p>
-</body>
-
-</html>
-
-===============================
-
-2. C:\xampp\htdocs\CodeIgniter\application\controllers\Welcome.php
+C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
 
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Welcome extends CI_Controller
+class Blog extends CI_Controller
 {
 
 	/**
@@ -105,19 +91,93 @@ class Welcome extends CI_Controller
 	 * map to /index.php/welcome/<method_name>
 	 * @see https://codeigniter.com/userguide3/general/urls.html
 	 */
-	public function index()
+	public function index($nama)
 	{
-		$this->load->view('welcome_message');
+		echo "Selamat Datang $nama";
 	}
-
-	public function percobaan()
+	public function listdata()
 	{
-		$this->load->view('percobaan');
+		$this->load->view('list_data');
+	}
+	public function detail()
+	{
+		$this->load->view('detail_blog');
+	}
+}
+
+
+==========================================================
+
+
+Contoh ke tiga :
+
+link nya : 
+
+http://localhost/CodeIgniter/index.php/blog/index/AudyariW/AB/PondokGede
+
+cara nya :
+
+yg di ubah :
+
+C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
+
+code nya :
+
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Blog extends CI_Controller
+{
+
+	/**
+	 * Index Page for this controller.
+	 *
+	 * Maps to the following URL
+	 * 		http://example.com/index.php/welcome
+	 *	- or -
+	 * 		http://example.com/index.php/welcome/index
+	 *	- or -
+	 * Since this controller is set as the default controller in
+	 * config/routes.php, it's displayed at http://example.com/
+	 *
+	 * So any other public methods not prefixed with an underscore will
+	 * map to /index.php/welcome/<method_name>
+	 * @see https://codeigniter.com/userguide3/general/urls.html
+	 */
+	public function index($nama, $goldarah, $alamat)
+	{
+		echo "Selamat Datang $nama, Golongan darah Anda $goldarah dan Alamat Anda $alamat";
+	}
+	public function listdata()
+	{
+		$this->load->view('list_data');
+	}
+	public function detail()
+	{
+		$this->load->view('detail_blog');
 	}
 }
 
 
 
-=====================================
+========================================================
+
+pengembangan biar sepasi nya masuk gk jadi %  :
+
+yg di ubah : 
+
+C:\xampp\htdocs\CodeIgniter\application\controllers\Blog.php
+
+public function index($nama, $goldarah, $alamat)
+	{
+		$nama = urldecode($nama);
+		$goldarah = urldecode($goldarah);
+		$alamat = urldecode($alamat);
+
+		echo "Selamat Datang $nama, Golongan darah Anda $goldarah dan Alamat Anda $alamat";
+	}
+
+
+==============================
 
 
