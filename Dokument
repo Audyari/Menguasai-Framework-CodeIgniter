@@ -1,11 +1,12 @@
-step by step pembuatan Form Validation Tutorial
+Menggunakan Library Upload
 
 =====================
 perhatian file ini :
 
 1. C:\xampp\htdocs\CodeIgniter\application\config\routes.php
-2. C:\xampp\htdocs\CodeIgniter\application\views\form_validation_view.php
-3. C:\xampp\htdocs\CodeIgniter\application\controllers\form_validation.php
+2. C:\xampp\htdocs\CodeIgniter\application\views\upload_form.php
+3. C:\xampp\htdocs\CodeIgniter\application\views\upload_success.php
+4. C:\xampp\htdocs\CodeIgniter\application\controllers\Upload.php
 
 =======================
 
@@ -13,11 +14,10 @@ testing ada 1 exmple  :
 
 link nya : 
 
-http://localhost/CodeIgniter/index.php/form_validation/validate_form
+http://localhost/CodeIgniter/
 
 
-yg di di ubah ADA 3 FILE : 
-
+yg di di ubah ADA 4 FILE : 
 
 1. C:\xampp\htdocs\CodeIgniter\application\config\routes.php
 
@@ -73,74 +73,101 @@ defined('BASEPATH') or exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 
-$route['default_controller'] = 'form_validation';
+$route['default_controller'] = 'upload';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
 
-============================================================
-2. C:\xampp\htdocs\CodeIgniter\application\views\form_validation_view.php
+==================================================================
+2. C:\xampp\htdocs\CodeIgniter\application\views\upload_form.php
+<html>
 
-<h2 class="mb-4">Form Validation Example</h2>
-<?php echo form_open('form_validation/validate_form', ['class' => 'form-horizontal']); ?>
-<div class="form-group row">
-	<label for="name" class="col-sm-2 col-form-label">Name</label>
-	<div class="col-sm-10">
-		<input type="text" class="form-control" id="name" name="name" />
-	</div>
-</div>
-<div class="form-group row">
-	<label for="email" class="col-sm-2 col-form-label">Email</label>
-	<div class="col-sm-10">
-		<input type="email" class="form-control" id="email" name="email" />
-	</div>
-</div>
-<?php if (validation_errors()) { ?>
-	<div class="row justify-content-center">
-		<div class="col-md-8">
-			<div class="alert alert-danger">
-				<?php echo validation_errors(); ?>
-			</div>
-		</div>
-	</div>
-<?php } ?>
-<div class="form-group row">
-	<label for="password" class="col-sm-2 col-form-label">Password</label>
-	<div class="col-sm-10">
-		<input type="password" class="form-control" id="password" name="password" />
-	</div>
-</div>
-<div class="form-group row">
-	<div class="col-sm-10 offset-sm-2">
-		<button type="submit" class="btn btn-primary">Submit</button>
-	</div>
-</div>
-<?php echo form_close(); ?>
+<head>
+	<title>Upload Form</title>
+</head>
 
+<body>
 
-=========================================================================
-3. C:\xampp\htdocs\CodeIgniter\application\controllers\form_validation.php
+	<?php echo $error; ?>
+
+	<?php echo form_open_multipart('upload/do_upload'); ?>
+
+	<input type="file" name="userfile" size="20" />
+
+	<br /><br />
+
+	<input type="submit" value="upload" />
+
+	</form>
+
+</body>
+
+</html>
+
+======================================================================
+3. C:\xampp\htdocs\CodeIgniter\application\views\upload_success.php
+
+<html>
+
+<head>
+	<title>Upload Form</title>
+</head>
+
+<body>
+
+	<h3>Your file was successfully uploaded!</h3>
+
+	<ul>
+		<?php foreach ($upload_data as $item => $value): ?>
+			<li><?php echo $item; ?>: <?php echo $value; ?></li>
+		<?php endforeach; ?>
+	</ul>
+
+	<p><?php echo anchor('upload', 'Upload Another File!'); ?></p>
+
+</body>
+
+</html>
+===================================================================
+4. C:\xampp\htdocs\CodeIgniter\application\controllers\Upload.php
 
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class form_validation extends CI_Controller
+class Upload extends CI_Controller
 {
-	public function validate_form()
+
+	public function __construct()
 	{
-		$this->load->library('form_validation');
+		parent::__construct();
+		$this->load->helper(array('form', 'url'));
+	}
 
-		$this->form_validation->set_rules('name', 'Name', 'required|min_length[3]|max_length[20]');
-		$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
-		$this->form_validation->set_rules('password', 'Password', 'required|min_length[6]|max_length[20]');
+	public function index()
+	{
+		$this->load->view('upload_form', array('error' => ' '));
+	}
 
-		if ($this->form_validation->run() == FALSE) {
-			$this->load->view('form_validation_view');
+	public function do_upload()
+	{
+		$config['upload_path'] = './uploads/';
+		$config['allowed_types'] = 'gif|jpg|png';
+		$config['max_size'] = 100;
+		$config['max_width'] = 1024;
+		$config['max_height'] = 768;
+
+		$this->load->library('upload', $config);
+
+		if (!$this->upload->do_upload('userfile')) {
+			$error = array('error' => $this->upload->display_errors());
+
+			$this->load->view('upload_form', $error);
 		} else {
-			echo 'Form is valid. Proceeding to next step...';
+			$data = array('upload_data' => $this->upload->data());
+
+			$this->load->view('upload_success', $data);
 		}
 	}
 }
-
-
-======================================================================
+?>
+===========================================================================
